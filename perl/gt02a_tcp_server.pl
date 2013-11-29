@@ -50,6 +50,14 @@ my $sth;
 #  
 sub convertGPSData(@)
 {
+	my $date_string = printf "20%#02d-#02d-#02d #02d:#02d:#02d", map hex, unpack("A2 A2 A2 A2 A2 A2",$_[1]);
+	return  ($_[0],
+	         $date_string,
+	         hex($_[2])/30000/60,
+	         hex($_[3])/30000/60,
+	         hex($_[4]),
+	         hex($_[5]),
+	         hex($_[6]));
 }
 
 #($imei,$date,$lng,$lat,$speed,$direction,$status)
