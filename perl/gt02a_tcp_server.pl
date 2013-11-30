@@ -45,7 +45,7 @@ my $sth;
 #  
 #  name: convertGPSData
 #  convert string to GPS Data
-#  @param  string format($imei,$date,$lng,$lat,$speed,$direction,$status)
+#  @param  string format($imei,$date,$lng,$lat,$
 #  @return db     format($imei,$date,$lng,$lat,$speed,$direction,$status)
 #  
 sub convertGPSData(@)
