@@ -18,3 +18,4 @@ build-mega2560/
 *.exe
 *.out
 *.app
+*.beam
