@@ -1,6 +1,6 @@
 %  gt02a_srv.erl
 %  
-%  Copyright 2013  <picuntu@g8picuntu>
+%  Copyright 2013  <corbamico@163.com>
 %  
 %  This program is free software; you can redistribute it and/or modify
 %  it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@
 
 %% define
 -define(SERVER,?MODULE).
--define(PORT,1055).
+-define(PORT,10550).
 
 %% API
--export([start_link/0,start_link/1,stop/0]).
+-export([start_link/1,stop/0]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -47,14 +47,11 @@
 %% @doc
 %% Starts the server
 %%
-%% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
+%% @spec start_link(Args) -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-start_link() ->
-    start_link(?PORT).
-    
-start_link(Port) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [Port], []).
+start_link(LSock) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [LSock], []).
 
 stop() ->
     gen_server:cast(?SERVER,stop).
@@ -73,11 +70,12 @@ stop() ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init([Port]) ->
-    {ok,LSock} = gen_tcp:listen(Port,[{active,true}]),
+init([LSock]) ->
+    %% move listen to gt02a_app
+    %% {ok,LSock} = gen_tcp:listen(Port,[{active,true}]),
     %% 0 -> timeout triger immediate, 
     %%  server async goes to handle_info(timeout)
-    {ok, #state{port=Port,lsock=LSock},0}.
+    {ok, #state{port=?PORT,lsock=LSock},0}.
     
 
 %%--------------------------------------------------------------------
@@ -124,12 +122,20 @@ handle_cast(_Msg, State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_info(timeout, State) ->
+handle_info(timeout, #state{lsock=LSock}=State) ->
+    {ok,_} = gen_tcp:accept(LSock),
+    %% Should spawn child again, here 
+    gt02a_sup:start_child(),
     {noreply, State};
-handle_info({tcp_closed}, State) ->
+    
+handle_info({tcp_closed,Sock}, State) ->
+    {stop,normal,State};
+    
+handle_info({tcp,Sock,Data}, State) ->
+	%% @TODO get socket data here, should handle it.
+	gen_tcp:send(Sock,Data),  
     {noreply, State};
-handle_info({tcp,data}, State) ->
-    {noreply, State};
+  
 handle_info(_Info, State) ->
     {noreply, State}.
 

@@ -1,4 +1,9 @@
+#arduino Object files
 build-mega2560/
+
+#erlang bin files in src
+src/*.beam
+!ebin/*.beam
 
 # Object files
 *.o
@@ -17,5 +22,4 @@ build-mega2560/
 # Executables
 *.exe
 *.out
-*.app
-*.beam
+
