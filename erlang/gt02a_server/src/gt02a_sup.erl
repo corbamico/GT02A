@@ -28,8 +28,17 @@
 %% Supervisor callbacks
 -export([init/1]).
 
--define(CHILD(Id, Mod, Type, Args), {Id, {Mod, start_link, Args},
-                                     permanent, 5000, Type, [Mod]}).
+-define(CHILD(Id, Mod, Type, Args), 
+        {Id, 
+         {Mod, start_link, Args},
+         temporary,
+         %%transient, 
+         %%permanent,
+         brutal_kill, 
+         Type, 
+         [Mod]
+         }
+        ).
 
 %%%===================================================================
 %%% API functions
@@ -63,7 +72,11 @@ start_link(LSock) ->
 %% @end
 %%--------------------------------------------------------------------
 init([LSock]) ->
-    {ok, {{one_for_one, 5, 10}, [?CHILD(gt02a_srv, gt02a_srv, worker, [LSock])]}}.
+    {ok, 
+      {{simple_one_for_one,0,60}, 
+       [?CHILD(gt02a_srv, gt02a_srv, worker, [LSock])]
+      }
+    }.
 
 %%%===================================================================
 %%% Internal functions

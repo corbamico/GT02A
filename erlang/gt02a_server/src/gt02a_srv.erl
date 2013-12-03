@@ -51,7 +51,13 @@
 %% @end
 %%--------------------------------------------------------------------
 start_link(LSock) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [LSock], []).
+%%  gen_server:start_link({local, ?MODULE}, ?MODULE, [LSock], []).
+%%  @note
+%%  Should not use {local,?MODULE} to register process name,
+%%  if want more one gt02a_srv process running!
+%%  if present {local,?MODULE}, got {error,{already_started,<0.38.0>} to
+%%     gt02a_sup:start_child() call
+    gen_server:start_link(?MODULE, [LSock], []).
 
 stop() ->
     gen_server:cast(?SERVER,stop).
@@ -125,7 +131,8 @@ handle_cast(_Msg, State) ->
 handle_info(timeout, #state{lsock=LSock}=State) ->
     {ok,_} = gen_tcp:accept(LSock),
     %% Should spawn child again, here 
-    gt02a_sup:start_child(),
+    {ok,_ }= 
+       gt02a_sup:start_child(),
     {noreply, State};
     
 handle_info({tcp_closed,Sock}, State) ->

@@ -26,7 +26,7 @@
     {description,"application for gt02a GPS tracker"},
 	{vsn,"0.0.1"},
 	{modules,[gt02a_srv,gt02a_sup]},
-	{registered,[gt02a_srv,gt02a_sup]},
+	{registered,[]},
 	{applications,[kernel,stdlib]},
     {mod,{gt02a_app,[]}},
     {start_phases,[]}

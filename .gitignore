@@ -2,8 +2,7 @@
 build-mega2560/
 
 #erlang bin files in src
-src/*.beam
-!ebin/*.beam
+*.beam
 
 # Object files
 *.o

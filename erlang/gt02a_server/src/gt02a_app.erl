@@ -52,7 +52,9 @@
 %%--------------------------------------------------------------------
 start(_StartType, _StartArgs) ->
     {ok,LSock} = gen_tcp:listen(?PORT,[{active,true}]),
-    gt02a_sup:start_link(LSock).
+    {ok, Pid} = gt02a_sup:start_link(LSock),
+    gt02a_sup:start_child(),
+    {ok,Pid}.
 
 %%--------------------------------------------------------------------
 %% @private
