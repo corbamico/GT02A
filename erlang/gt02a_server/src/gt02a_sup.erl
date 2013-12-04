@@ -73,7 +73,7 @@ start_link(LSock) ->
 %%--------------------------------------------------------------------
 init([LSock]) ->
     {ok, 
-      {{simple_one_for_one,0,60}, 
+      {{simple_one_for_one,60,60}, 
        [?CHILD(gt02a_srv, gt02a_srv, worker, [LSock])]
       }
     }.
