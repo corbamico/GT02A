@@ -24,7 +24,7 @@
 
 ERL = erl -boot start_clean
 
-MODS = gt02a_srv gt02a_sup gt02a_app
+MODS = gt02a_cli_sock gt02a_cli_sup gt02a_srv gt02a_sup gt02a_app
 
 all:compile
 

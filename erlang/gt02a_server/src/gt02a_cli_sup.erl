@@ -1,4 +1,4 @@
-%  gt02a_sup.erl
+%  gt02a_cli_sup.erl
 %  
 %  Copyright 2013  <corbamico@163.com>
 %  
@@ -18,28 +18,29 @@
 %  MA 02110-1301, USA.
 %  
 %  
--module(gt02a_sup).
+-module(gt02a_cli_sup).
 
 -behaviour(supervisor).
 
 %% API
--export([start_link/1]).
+-export([start_link/0,start_child/1]).
 
 %% Supervisor callbacks
 -export([init/1]).
 
--define(CHILD_PERMANENT(Id, Mod, Type, Args), 
-        {Id, 
+-define(CHILD_TEMPORARY(Id,Mod, Type, Args), 
+        {
+         %%list_to_atom(binary_to_list(term_to_binary(id))), 
+         Id,
          {Mod, start_link, Args},
-         %%temporary,
+         temporary,
          %%transient, 
-         permanent,
+         %%permanent,
          brutal_kill, 
          Type, 
          [Mod]
          }
         ).
-
 
 %%%===================================================================
 %%% API functions
@@ -49,13 +50,11 @@
 %% @doc
 %% Starts the supervisor
 %%
-%% @spec start_link(Args) -> {ok, Pid} | ignore | {error, Error}
+%% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-start_link(LSock) ->
-    {ok,Pid}=supervisor:start_link({local, ?MODULE}, ?MODULE, [LSock]),
-    
-    {ok,Pid}.
+start_link() ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 %%%===================================================================
 %%% Supervisor callbacks
@@ -74,17 +73,22 @@ start_link(LSock) ->
 %%                     {error, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init([LSock]) ->
+init([]) ->
     {ok, 
-      {{one_for_one,1000,1}, 
-       [ ?CHILD_PERMANENT(gt02a_srv, gt02a_srv, worker, [LSock])
-        ]
+      {{simple_one_for_one,0,1}, 
+       [ 
+         ?CHILD_TEMPORARY(gt02a_cli_sock,gt02a_cli_sock, worker, [])]
       }
     }.
 
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+start_child(ClientSock)->
+    {ok,Pid} = supervisor:start_child(?MODULE,[]),
+    gen_tcp:controlling_process(ClientSock,Pid),
+    {ok,Pid}.
+
 
 
 
